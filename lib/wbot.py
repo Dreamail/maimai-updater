@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from typing import Optional
 
 from nonebot import logger
@@ -36,8 +36,8 @@ async def init_wahlap():
 async def check_token():
     global _wahlap
     if (not _wahlap or await _wahlap.is_token_expired()) and not (
-        4 >= datetime.datetime.now(tz=ZoneInfo("Asia/Shanghai")).hour
-        and datetime.datetime.now("Asia/Shanghai").hour <= 6
+        4 <= datetime.now(tz=ZoneInfo("Asia/Shanghai")).hour
+        and datetime.now(tz=ZoneInfo("Asia/Shanghai")).hour <= 6
     ):
         try:
             wc = WeChat()
