@@ -1,4 +1,5 @@
 nonebot_plugin_apscheduler
+nonebot_plugin_saa
 httpx
 peewee
 peewee-async
