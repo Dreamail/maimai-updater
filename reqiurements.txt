@@ -1,0 +1,5 @@
+nonebot_plugin_apscheduler
+httpx
+peewee
+peewee-async
+aiosqlite
