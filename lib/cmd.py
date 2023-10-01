@@ -6,11 +6,6 @@ from nonebot.adapters import Event
 from nonebot.exception import FinishedException
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, Depends
-from nonebot_plugin_saa.utils import (
-    PlatformTarget,
-    TargetQQPrivate,
-    get_target,
-)
 
 from . import utils
 from .db import User, get_or_create_user, update_user
@@ -37,13 +32,9 @@ async def _():
 
 
 async def pre_bind(
-    matcher: Matcher, event: Event, target: PlatformTarget = Depends(get_target)
+    matcher: Matcher, event: Event
 ):
-    if not isinstance(target, TargetQQPrivate):
-        await utils.send_with_reply("绑定只能私聊哦！（才不是因为中之人懒得写）")
-        await matcher.finish()
-
-    user = await get_or_create_user(target.user_id)
+    user = await get_or_create_user(event.get_user_id())
     if user.maimai_id and user.token and not matcher.state.get("rebind", False):
         if matcher.get_target() == "confirm":
             if event.get_plaintext() == "是":
