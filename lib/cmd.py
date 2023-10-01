@@ -26,9 +26,13 @@ update = on_command(("maip", "update"), force_whitespace=True, block=True)
 async def _():
     await utils.send_with_reply(
         """
-        帮助列表还没写呜呜呜
-        """
-    )  # TODO
+        指令列表：
+        maip.bind 交互式绑定账号
+        maip.update 更新成绩
+
+        注：maip是指maimai prober，而不是你这个mai批
+        """.strip().replace("    ", "")
+    )
     await mai.finish()
 
 
