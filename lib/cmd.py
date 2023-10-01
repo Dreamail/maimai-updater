@@ -19,7 +19,7 @@ update = on_command(("maip", "update"), force_whitespace=True, block=True)
 
 @mai.handle()
 async def _():
-    await utils.send_with_reply(
+    await utils.finish_with_reply(
         """
         指令列表：
         maip.bind 交互式绑定账号
@@ -28,7 +28,6 @@ async def _():
         注：maip是指maimai prober，而不是你这个mai批
         """.strip().replace("    ", "")
     )
-    await mai.finish()
 
 
 async def pre_bind(
@@ -41,23 +40,23 @@ async def pre_bind(
                 matcher.state["rebind"] = True
                 return
             elif event.get_plaintext() == "否":
-                await matcher.finish("绑定取消")
+                await utils.finish_with_reply("绑定取消")
             else:
                 matcher.set_target("confirm")
-                await matcher.reject("回复「是」重新绑定，回复「否」取消绑定")
+                await utils.reject_with_reply("回复「是」重新绑定，回复「否」取消绑定")
 
         else:
             matcher.set_target("confirm")
-            await matcher.send("你已经绑定过啦！")
-            await matcher.reject("回复「是」重新绑定，回复「否」取消绑定")
+            await utils.send_with_reply("你已经绑定过啦！")
+            await utils.reject_with_reply("回复「是」重新绑定，回复「否」取消绑定")
 
     matcher.state["muser"] = user
     return
 
 
 @utils.add_parameterless(bind, [Depends(pre_bind)])
-@bind.got("token", "请告诉我你的查分器更新token～")
-@bind.got("mid", "请告诉我你的maimai好友代码～")
+@utils.got_with_reply(bind, "token", "请告诉我你的查分器更新token～")
+@utils.got_with_reply(bind, "mid", "请告诉我你的maimai好友代码～")
 async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainText()):
     user: User = matcher.state["muser"]
     wl = get_wahlap()
@@ -70,53 +69,53 @@ async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainTe
                 params={"token": token},
             )
             if resp.status_code == 404:
-                await bind.finish("查分器账号token有误，请检查一下哦")
+                await utils.finish_with_reply("查分器账号token有误，请检查一下哦")
             if resp.status_code != 200:
                 await utils.send_to_super(
                     "on bind: (" + resp.status_code + ")" + await resp.text
                 )
-                await bind.finish("登录查分器出错啦，请稍后再试或联系管理员")
+                await utils.finish_with_reply("登录查分器出错啦，请稍后再试或联系管理员")
     except FinishedException:
         raise
     except Exception as e:
         await utils.send_to_super("on bind: " + str(e))
-        await bind.finish("登录查分器出错啦，请稍后再试或联系管理员")
+        await utils.finish_with_reply("登录查分器出错啦，请稍后再试或联系管理员")
 
     user.token = token
 
     # bind maimai
     try:
         if not await wl.validate_friend_code(mid):
-            await bind.finish("找不到你哟，请检查好友ID是否正确")
+            await utils.finish_with_reply("找不到你哟，请检查好友ID是否正确")
     except RuntimeError as e:
         await utils.send_to_super("on bind: " + str(e))
-        await bind.finish("找你找出错啦，请稍后再试或联系管理员")
+        await utils.finish_with_reply("找你找出错啦，请稍后再试或联系管理员")
 
     try:
         friend_list = await wl.get_friend_list()
         if mid in friend_list:
             user.maimai_id = mid
             await update_user(user)
-            await bind.finish("你已经是好友了，所以绑定成功啦！")
+            await utils.finish_with_reply("你已经是好友了，所以绑定成功啦！")
 
         sent_list = await wl.get_sent_friend_requsets()
         if mid in sent_list:
             user.maimai_id = mid
             await update_user(user)
-            await bind.finish("已经给你发过好友请求了啦，同意好友申请就完成绑定啦！")
+            await utils.finish_with_reply("已经给你发过好友请求了啦，同意好友申请就完成绑定啦！")
     except RuntimeError as e:
         await utils.send_to_super("on bind: " + str(e))
-        await bind.finish("添加好友失败了，请稍后再试或联系管理员")
+        await utils.finish_with_reply("添加好友失败了，请稍后再试或联系管理员")
 
     try:
         await wl.send_friend_requset(mid)
     except RuntimeError as e:
         await utils.send_to_super("on bind: " + str(e))
-        await bind.finish("发送好友请求失败，请稍后再试或联系管理员")
+        await utils.finish_with_reply("发送好友请求失败，请稍后再试或联系管理员")
 
     user.maimai_id = mid
     await update_user(user)
-    await bind.finish("给你发送好友请求啦，同意好友申请就完成绑定啦！")
+    await utils.finish_with_reply("给你发送好友请求啦，同意好友申请就完成绑定啦！")
 
 
 @update.handle()
@@ -125,11 +124,9 @@ async def _(event: Event):
     wl = get_wahlap()
 
     if not user.maimai_id:
-        await utils.send_with_reply("你还未绑定maimai账户，先进行一个账户绑定吧！")
-        await update.finish()
+        await utils.finish_with_reply("你还未绑定maimai账户，先进行一个账户绑定吧！")
     if not user.token:
-        await utils.send_with_reply("你还未绑定查分器账户，先进行一个账户绑定吧！")
-        await update.finish()
+        await utils.finish_with_reply("你还未绑定查分器账户，先进行一个账户绑定吧！")
 
     await utils.send_with_reply("开始更新成绩～")
 
@@ -137,8 +134,7 @@ async def _(event: Event):
         await wl.favorite_on_friend(user.maimai_id)
     except RuntimeError as e:
         await utils.send_to_super("on update: " + str(e))
-        await utils.send_with_reply("把你登陆到喜爱失败惹，请稍后再试或联系管理员")
-        await bind.finish()
+        await utils.finish_with_reply("把你登陆到喜爱失败惹，请稍后再试或联系管理员")
 
     async def _wap(coro):
         try:
@@ -161,17 +157,15 @@ async def _(event: Event):
         if isinstance(result, Exception):
             err_diffs.append(DIFF[diff])
     if len(err_diffs) != 0:
-        await utils.send_with_reply(
+        await utils.finish_with_reply(
             "更新{diff}难度时出现问题，请稍后再试或联系管理员".format(
                 diff=", ".join(err_diffs)
             )  # noqa: E501
         )
-        await update.finish()
 
     try:
         await wl.favorite_off_friend(user.maimai_id)
     except RuntimeError as e:
         utils.send_to_super("on update: " + str(e))
 
-    await utils.send_with_reply("所有成绩更新完成！")
-    await update.finish()
+    await utils.finish_with_reply("所有成绩更新完成！")
