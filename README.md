@@ -8,6 +8,10 @@
 > 6.我在此向曾经不存在的勿传播通知致歉，我不该在你还没出生的时候出教程  
 > 11.无论你认为我有什么问题，我都接受，能让你心情舒畅就好  
 > ![106d0a856538aa3fd793722d38e90b36](https://github.com/Dreamail/maimai-updater/assets/46253320/e5e6b3db-0992-41a4-b97e-8f16a032392d)
+>
+> 另外，chro是chro，liteloader是ll，shamrock是shamrock，他们不是同一个东西，我希望某些人不要造谣，这三个东西原本与云崽是毫不相干的，我所提及的官网通知来源于云崽而不是这三者中任何一个。我也从未出过shamrock的任何教程，他们三个的实现环境也完全不一样，特此说明
+>
+> Oct 19 16:51 original post was deleted
 
 # maimai-updater
 Update your maimai dx record through QQ. Depends on friend vs. Adapted to nonebot2
