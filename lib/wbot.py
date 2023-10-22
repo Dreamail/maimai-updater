@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+import httpx
 from nonebot import logger
 from nonebot_plugin_saa import Image, Text
 from zoneinfo import ZoneInfo
@@ -43,10 +44,13 @@ async def check_token():
             wc = WeChat()
             uuid = await wc.get_login_uuid()
 
-            await send_to_super(
-                Image("https://login.weixin.qq.com/qrcode/" + uuid)
-                + Text("maibot: token expired")
-            )
+            async with httpx.AsyncClient() as client:
+                resp = await client.get("https://login.weixin.qq.com/qrcode/" + uuid)
+                await send_to_super(
+                    Image(resp.content)
+                    + Text("maibot: token expired")
+                )
+                await resp.aclose()
 
             await wc.wait_login()
             await send_to_super("maibot: wechat login success")
@@ -62,5 +66,5 @@ async def check_token():
         except Exception as e:
             logger.exception(e)
             await send_to_super(
-                "maibot: refresh token failed: " + str(type(e)) + ": " + str(e)
+                "maibot: refresh token failed: " + str(type(e)).split(".")[-1] + ": " + str(e)
             )

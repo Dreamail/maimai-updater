@@ -10,6 +10,10 @@ driver = get_driver()
 data_dir = "data/maimai-prober/"
 os.makedirs(data_dir, exist_ok=True)
 
+from .config import Config  # noqa: E402
+
+plugin_config = Config.parse_obj(driver.config)
+
 from .lib import wbot  # noqa: E402
 
 

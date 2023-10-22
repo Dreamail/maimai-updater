@@ -1,4 +1,4 @@
-from peewee import IntegerField, Model, TextField
+from peewee import Model, TextField
 from peewee_async import Manager
 
 from .. import data_dir
@@ -19,7 +19,7 @@ class Token(BaseModel):
 
 
 class User(BaseModel):
-    qq_id = IntegerField(primary_key=True)
+    imid = TextField(primary_key=True)
     maimai_id = TextField(null=True)
     token = TextField(null=True)
 
@@ -27,8 +27,8 @@ class User(BaseModel):
 db.create_tables([Token, User])
 
 
-async def get_or_create_user(qq_id: int) -> User:
-    return (await objects.get_or_create(User, qq_id=qq_id))[0]
+async def get_or_create_user(imid: str) -> User:
+    return (await objects.get_or_create(User, imid=imid))[0]
 
 
 async def update_user(user: User):
