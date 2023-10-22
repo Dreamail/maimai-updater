@@ -1,5 +1,5 @@
-nonebot_plugin_apscheduler
-nonebot_plugin_saa
+nonebot-plugin-apscheduler
+nonebot-plugin-send-anything-anywhere
 httpx
 peewee
 peewee-async
