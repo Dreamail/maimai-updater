@@ -46,7 +46,7 @@ async def send_with_reply(msg: MessageFactory | str):
     """带reply回复消息，仅能用在事件响应器中"""
     if isinstance(msg, str):
         msg = Text(msg)
-    await msg.send(reply=True)
+    await msg.send(reply=True, at_sender=True)
 
 
 def add_parameterless(matcher: Matcher, parameterless: Optional[Iterable[Any]] = None):
