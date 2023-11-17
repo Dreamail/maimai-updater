@@ -11,6 +11,7 @@ from nonebot_plugin_saa import (
     MessageFactory,
     TargetQQGuildChannel,
     TargetQQGuildDirect,
+    TargetQQGroup,
     TargetQQPrivate,
     Text,
 )
@@ -24,15 +25,20 @@ async def send_to_super(msg: MessageFactory | str):
             if isinstance(msg, str):
                 msg = Text(msg)
             await msg.send_to(TargetQQPrivate(user_id=suser), bot)
+        if plugin_config.super_group:
+            if isinstance(msg, str):
+                msg = Text(msg)
+            await msg.send_to(TargetQQGroup(group_id=plugin_config.super_group), bot)
         if plugin_config.super_channel:
             if isinstance(msg, str):
                 msg = Text(msg)
             await msg.send_to(TargetQQGuildChannel(channel_id=plugin_config.super_channel), bot)
-        for suser in plugin_config.super_guild_users:
-            split = suser.split("/")
-            if isinstance(msg, str):
-                msg = Text(msg)
-            await msg.send_to(TargetQQGuildDirect(recipient_id=split[1], source_guild_id=split[0]), bot)
+        if plugin_config.super_guild_users:
+            for suser in plugin_config.super_guild_users:
+                split = suser.split("/")
+                if isinstance(msg, str):
+                    msg = Text(msg)
+                await msg.send_to(TargetQQGuildDirect(recipient_id=split[1], source_guild_id=split[0]), bot)
 
 
 
