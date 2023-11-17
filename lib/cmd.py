@@ -13,9 +13,9 @@ from .db import User, get_or_create_user, update_user
 from .prober import DIFF, update_score
 from .wbot import get_wahlap
 
-mai = on_command("maip", force_whitespace=True, block=True, rule=to_me())
-bind = on_command("maib", force_whitespace=True, block=True, rule=to_me())
-update = on_command("maiu", force_whitespace=True, block=True, rule=to_me())
+mai = on_command("maip", force_whitespace=True, block=True)
+bind = on_command("maib", force_whitespace=True, block=True)
+update = on_command("maiu", force_whitespace=True, block=True)
 
 
 @mai.handle()
