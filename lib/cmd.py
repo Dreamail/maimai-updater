@@ -13,9 +13,9 @@ from .db import User, get_or_create_user, update_user
 from .prober import DIFF, update_score
 from .wbot import get_wahlap
 
-mai = on_command("maip", force_whitespace=True, block=True)
-bind = on_command("maib", force_whitespace=True, block=True)
-update = on_command("maiu", force_whitespace=True, block=True)
+mai = on_command("maip", force_whitespace=True, block=True, rule=to_me())
+bind = on_command("maib", force_whitespace=True, block=True, rule=to_me())
+update = on_command("maiu", force_whitespace=True, block=True, rule=to_me())
 
 
 @mai.handle()
@@ -26,7 +26,7 @@ async def _():
         /maib 交互式绑定账号
         /maiu 更新成绩
 
-        注：maip是指maimai prober，而不是你这个mai批
+        注：maip是指maimai prober
         """.strip().replace("    ", "")
     )
 
@@ -56,9 +56,11 @@ async def pre_bind(
 
 
 @utils.add_parameterless(bind, [Depends(pre_bind)])
-@utils.got_with_reply(bind, "token", "请告诉我你的查分器更新token～")
-@utils.got_with_reply(bind, "mid", "请告诉我你的maimai好友代码～")
+@utils.got_with_reply(bind, "token", "请「回复」我你的查分器更新token～")
+@utils.got_with_reply(bind, "mid", "请「回复」我你的maimai好友代码～")
 async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainText()):
+    token = token.strip()
+    mid = mid.strip()
     user: User = matcher.state["muser"]
     wl = get_wahlap()
 
