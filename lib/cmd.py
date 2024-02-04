@@ -160,15 +160,15 @@ async def _(event: Event):
         if isinstance(result, Exception):
             err_diffs.append(DIFF[diff])
     if len(err_diffs) != 0:
-        await utils.finish_with_reply(
+        await utils.send_with_reply(
             "更新{diff}难度时出现问题，请稍后再试或联系管理员".format(
                 diff=", ".join(err_diffs)
             )  # noqa: E501
         )
+    else:
+        await utils.send_with_reply("所有成绩更新完成！")
 
     try:
         await wl.favorite_off_friend(user.maimai_id)
     except RuntimeError as e:
         utils.send_to_super("on update: " + str(e))
-
-    await utils.finish_with_reply("所有成绩更新完成！")
