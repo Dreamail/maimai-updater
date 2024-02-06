@@ -48,10 +48,7 @@ async def check_token(force: bool = False) -> bool:
 
             async with httpx.AsyncClient() as client:
                 resp = await client.get("https://login.weixin.qq.com/qrcode/" + uuid)
-                await send_to_super(
-                    Image(resp.content)
-                    + Text("maibot: token expired")
-                )
+                await send_to_super(Image(resp.content) + Text("maibot: token expired"))
                 await resp.aclose()
 
             await wc.wait_login()
@@ -69,6 +66,9 @@ async def check_token(force: bool = False) -> bool:
         except Exception as e:
             logger.exception(e)
             await send_to_super(
-                "maibot: refresh token failed: " + str(type(e)).split(".")[-1] + ": " + str(e)
+                "maibot: refresh token failed: "
+                + str(type(e)).split(".")[-1]
+                + ": "
+                + str(e)
             )
     return False

@@ -13,21 +13,16 @@ from nonebot_plugin_alconna import on_alconna
 from . import utils
 from .db import User, get_or_create_user, update_user
 from .prober import DIFF, update_score
-from .wbot import get_wahlap, check_token
+from .wbot import check_token, get_wahlap
 
 mai = on_command("maip", force_whitespace=True, block=True, rule=to_me())
 bind = on_command("maib", force_whitespace=True, block=True, rule=to_me())
 update = on_command("maiu", force_whitespace=True, block=True, rule=to_me())
 
 debug = on_alconna(
-    Alconna(
-        ["/"], "debug",
-        Subcommand(
-            "retoken"
-        )
-    ),
-    block=True, rule=to_me()
+    Alconna(["/"], "debug", Subcommand("retoken")), block=True, rule=to_me()
 )
+
 
 @mai.handle()
 async def _():
@@ -42,9 +37,7 @@ async def _():
     )
 
 
-async def pre_bind(
-    matcher: Matcher, event: Event
-):
+async def pre_bind(matcher: Matcher, event: Event):
     user = await get_or_create_user(event.get_user_id())
     if user.maimai_id and user.token and not matcher.state.get("rebind", False):
         if matcher.get_target() == "confirm":
@@ -88,7 +81,9 @@ async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainTe
                 await utils.send_to_super(
                     "on bind: (" + resp.status_code + ")" + await resp.text
                 )
-                await utils.finish_with_reply("登录查分器出错啦，请稍后再试或联系管理员")
+                await utils.finish_with_reply(
+                    "登录查分器出错啦，请稍后再试或联系管理员"
+                )
     except FinishedException:
         raise
     except Exception as e:
@@ -116,7 +111,9 @@ async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainTe
         if mid in sent_list:
             user.maimai_id = mid
             await update_user(user)
-            await utils.finish_with_reply("已经给你发过好友请求了啦，同意好友申请就完成绑定啦！")
+            await utils.finish_with_reply(
+                "已经给你发过好友请求了啦，同意好友申请就完成绑定啦！"
+            )
     except RuntimeError as e:
         await utils.send_to_super("on bind: " + str(e))
         await utils.finish_with_reply("添加好友失败了，请稍后再试或联系管理员")
@@ -183,6 +180,7 @@ async def _(event: Event):
         await wl.favorite_off_friend(user.maimai_id)
     except RuntimeError as e:
         utils.send_to_super("on update: " + str(e))
+
 
 @debug.assign("retoken")
 async def _():
