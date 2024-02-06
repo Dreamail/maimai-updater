@@ -10,6 +10,7 @@ from nonebot.params import ArgPlainText, Depends
 from nonebot.rule import to_me
 from nonebot_plugin_alconna import on_alconna
 
+from .. import plugin_config
 from . import utils
 from .db import User, get_or_create_user, update_user
 from .prober import DIFF, update_score
@@ -155,7 +156,10 @@ async def _(event: Event):
             await utils.send_to_super("on update: " + str(e))
         return result
 
-    tasks = [_wap(update_score(wl, user.token, user.maimai_id, i)) for i in range(5)]
+    tasks = [
+        _wap(update_score(wl, user.token, user.maimai_id, i, plugin_config.strict))
+        for i in range(5)
+    ]
     results = await asyncio.gather(*tasks)
 
     err_diffs = []

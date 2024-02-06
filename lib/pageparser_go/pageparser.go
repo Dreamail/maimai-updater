@@ -39,6 +39,11 @@ func ParseRecords(achievementsvs, dxscorevs string, diff int) (string, error) {
 
 		link_searched := false // fuck duplicated name
 		for _, e := range elements {
+			scoreString := strings.TrimSpace(htmlquery.InnerText(htmlquery.Find(e, fmt.Sprintf(`//table[@class="f_14 t_c"]/tbody/tr/td[@class="p_r %s_score_label w_120 f_b"]`, diffStr[diff]))[1]))
+			if scoreString == "― %" || scoreString == "―" {
+				continue
+			}
+
 			title := htmlquery.InnerText(htmlquery.FindOne(e, `//div[@class="music_name_block t_l f_13 break"]`))
 
 			if title == "Link" && !link_searched { // the frist Link shoud be niconico & VOCALOID grene
@@ -52,16 +57,15 @@ func ParseRecords(achievementsvs, dxscorevs string, diff int) (string, error) {
 				kind = "SD"
 			}
 
-			scoreString := htmlquery.InnerText(htmlquery.Find(e, fmt.Sprintf(`//table[@class="f_14 t_c"]/tbody/tr/td[@class="p_r %s_score_label w_120 f_b"]`, diffStr[diff]))[1])
 			if record, ok := recordMap[title+kind]; ok {
 				if strings.Contains(scoreString, "%") {
-					achievements, err := strconv.ParseFloat(strings.TrimSpace(strings.ReplaceAll(scoreString, "%", "")), 64)
+					achievements, err := strconv.ParseFloat(strings.ReplaceAll(scoreString, "%", ""), 64) // who will add a whitespace between number and % ?
 					if err != nil {
 						return err
 					}
 					record.Achievements = achievements
 				} else {
-					dxScore, err := strconv.ParseInt(strings.TrimSpace(strings.ReplaceAll(scoreString, ",", "")), 10, 32)
+					dxScore, err := strconv.ParseInt(strings.ReplaceAll(scoreString, ",", ""), 10, 32)
 					if err != nil {
 						return err
 					}
@@ -73,13 +77,13 @@ func ParseRecords(achievementsvs, dxscorevs string, diff int) (string, error) {
 				Title: title,
 			}
 			if strings.Contains(scoreString, "%") {
-				achievements, err := strconv.ParseFloat(strings.TrimSpace(strings.ReplaceAll(scoreString, "%", "")), 64)
+				achievements, err := strconv.ParseFloat(strings.ReplaceAll(scoreString, "%", ""), 64)
 				if err != nil {
 					return err
 				}
 				recordMap[title+kind].Achievements = achievements
 			} else {
-				dxScore, err := strconv.ParseInt(strings.TrimSpace(strings.ReplaceAll(scoreString, ",", "")), 10, 32)
+				dxScore, err := strconv.ParseInt(strings.ReplaceAll(scoreString, ",", ""), 10, 32)
 				if err != nil {
 					return err
 				}

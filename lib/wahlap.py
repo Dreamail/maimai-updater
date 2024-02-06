@@ -159,11 +159,21 @@ class Wahlap:
         await self._send_friend_api("/maimai-mobile/friend/favoriteOff/", idx=idx)
 
     async def get_friend_vs(
-        self, idx: str, score_type: int, diff: int, only_lose: Optional[bool] = False
+        self,
+        idx: str,
+        score_type: int,
+        diff: int,
+        only_played: Optional[bool] = False,
+        only_lose: Optional[bool] = False,
+        only_win: Optional[bool] = False,
     ) -> str:
         params = {"genre": "99", "scoreType": score_type, "diff": diff, "idx": idx}
+        if only_played:
+            params = params | {"playCheck": "on"}
         if only_lose:
             params = params | {"loseOnly": "on"}
+        if only_win:
+            params = params | {"winOnly": "on"}
 
         req = self.client.build_request(
             "GET",

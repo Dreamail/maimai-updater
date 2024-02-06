@@ -9,5 +9,7 @@ class Config(BaseModel):
     super_channel: Optional[str] = None
     super_guild_users: Optional[list[str]] = None
 
+    strict: Optional[int] = 0
+
     class Config:
         extra = "ignore"
