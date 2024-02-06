@@ -1,5 +1,6 @@
 nonebot-plugin-apscheduler
 nonebot-plugin-send-anything-anywhere
+nonebot_plugin_alconna
 httpx
 peewee
 peewee-async

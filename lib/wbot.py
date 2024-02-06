@@ -34,12 +34,14 @@ async def init_wahlap():
             await send_to_super("maibot: create bot client err: " + str(e))
 
 
-async def check_token():
+async def check_token(force: bool = False) -> bool:
     global _wahlap
-    if (not _wahlap or await _wahlap.is_token_expired()) and not (
+    expired = not _wahlap or await _wahlap.is_token_expired()
+    isactived = not (
         4 <= datetime.now(tz=ZoneInfo("Asia/Shanghai")).hour
         and datetime.now(tz=ZoneInfo("Asia/Shanghai")).hour <= 6
-    ):
+    )
+    if (expired and isactived) or force:
         try:
             wc = WeChat()
             uuid = await wc.get_login_uuid()
@@ -63,8 +65,10 @@ async def check_token():
             await save_token(*maitoken)
 
             await send_to_super("maibot: refresh token success")
+            return True
         except Exception as e:
             logger.exception(e)
             await send_to_super(
                 "maibot: refresh token failed: " + str(type(e)).split(".")[-1] + ": " + str(e)
             )
+    return False

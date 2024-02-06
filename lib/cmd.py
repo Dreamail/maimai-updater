@@ -1,22 +1,33 @@
 import asyncio
 
 import httpx
+from arclet.alconna import Alconna, Subcommand
 from nonebot import on_command
 from nonebot.adapters import Event
 from nonebot.exception import FinishedException
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, Depends
 from nonebot.rule import to_me
+from nonebot_plugin_alconna import on_alconna
 
 from . import utils
 from .db import User, get_or_create_user, update_user
 from .prober import DIFF, update_score
-from .wbot import get_wahlap
+from .wbot import get_wahlap, check_token
 
 mai = on_command("maip", force_whitespace=True, block=True, rule=to_me())
 bind = on_command("maib", force_whitespace=True, block=True, rule=to_me())
 update = on_command("maiu", force_whitespace=True, block=True, rule=to_me())
 
+debug = on_alconna(
+    Alconna(
+        ["/"], "debug",
+        Subcommand(
+            "retoken"
+        )
+    ),
+    block=True, rule=to_me()
+)
 
 @mai.handle()
 async def _():
@@ -172,3 +183,8 @@ async def _(event: Event):
         await wl.favorite_off_friend(user.maimai_id)
     except RuntimeError as e:
         utils.send_to_super("on update: " + str(e))
+
+@debug.assign("retoken")
+async def _():
+    success = await check_token(force=True)
+    await utils.send_with_reply("token刷新成功！" if success else "token刷新失败")
