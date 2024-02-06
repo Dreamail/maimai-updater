@@ -155,13 +155,8 @@ async def _(event: Event):
             await utils.send_to_super("on update: " + str(e))
         return result
 
-    results = await asyncio.gather(
-        _wap(update_score(wl, user.token, user.maimai_id, 0)),
-        _wap(update_score(wl, user.token, user.maimai_id, 1)),
-        _wap(update_score(wl, user.token, user.maimai_id, 2)),
-        _wap(update_score(wl, user.token, user.maimai_id, 3)),
-        _wap(update_score(wl, user.token, user.maimai_id, 4)),  # quite stupid
-    )
+    tasks = [_wap(update_score(wl, user.token, user.maimai_id, i)) for i in range(5)]
+    results = await asyncio.gather(*tasks)
 
     err_diffs = []
     for diff, result in enumerate(results):
