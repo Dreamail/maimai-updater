@@ -5,10 +5,9 @@ from nonebot import get_driver, logger, require
 require("nonebot_plugin_apscheduler")
 
 from nonebot_plugin_apscheduler import scheduler  # noqa: E402
+from nonebot_plugin_orm import async_scoped_session  # noqa: E402
 
 driver = get_driver()
-data_dir = "data/maimai-prober/"
-os.makedirs(data_dir, exist_ok=True)
 
 from .config import Config  # noqa: E402
 
@@ -18,14 +17,14 @@ from .lib import wbot  # noqa: E402
 
 
 @driver.on_bot_connect
-async def init():
+async def init(sess: async_scoped_session):
     logger.info("init maibot...")
-    await wbot.init_wahlap()
+    await wbot.init_wahlap(sess)
     logger.info("check maimai token...")
-    await wbot.check_token()
+    await wbot.check_token(sess)
     logger.info("prober init successfully")
 
-    scheduler.add_job(wbot.check_token, "interval", hours=1)
+    scheduler.add_job(wbot.check_token, trigger="interval", args=[sess], hours=1)
 
 
 @driver.on_shutdown

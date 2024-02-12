@@ -9,10 +9,11 @@ from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, Depends
 from nonebot.rule import to_me
 from nonebot_plugin_alconna import on_alconna
+from nonebot_plugin_orm import async_scoped_session
 
 from .. import plugin_config
 from . import utils
-from .db import User, get_or_create_user, update_user
+from .db import User
 from .prober import DIFF, update_score
 from .wbot import check_token, get_wahlap
 
@@ -38,9 +39,8 @@ async def _():
     )
 
 
-async def pre_bind(matcher: Matcher, event: Event):
-    user = await get_or_create_user(event.get_user_id())
-    if user.maimai_id and user.token and not matcher.state.get("rebind", False):
+async def pre_bind(matcher: Matcher, event: Event, user: User):
+    if user and not matcher.state.get("rebind", False):
         if matcher.get_target() == "confirm":
             if event.get_plaintext() == "是":
                 matcher.state["rebind"] = True
@@ -56,17 +56,18 @@ async def pre_bind(matcher: Matcher, event: Event):
             await utils.send_with_reply("你已经绑定过啦！")
             await utils.reject_with_reply("回复「是」重新绑定，回复「否」取消绑定")
 
-    matcher.state["muser"] = user
-    return
-
 
 @utils.add_parameterless(bind, [Depends(pre_bind)])
 @utils.got_with_reply(bind, "token", "请「回复」我你的查分器更新token～")
 @utils.got_with_reply(bind, "mid", "请「回复」我你的maimai好友代码～")
-async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainText()):
+async def _(
+    event: Event,
+    sess: async_scoped_session,
+    token: str = ArgPlainText(),
+    mid: str = ArgPlainText(),
+):
     token = token.strip()
     mid = mid.strip()
-    user: User = matcher.state["muser"]
     wl = get_wahlap()
 
     # bind prober
@@ -91,8 +92,6 @@ async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainTe
         await utils.send_to_super("on bind: " + str(e))
         await utils.finish_with_reply("登录查分器出错啦，请稍后再试或联系管理员")
 
-    user.token = token
-
     # bind maimai
     try:
         if not await wl.validate_friend_code(mid):
@@ -104,14 +103,14 @@ async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainTe
     try:
         friend_list = await wl.get_friend_list()
         if mid in friend_list:
-            user.maimai_id = mid
-            await update_user(user)
+            sess.add(User(user_id=event.get_user_id(), friend_id=mid, df_token=token))
+            await sess.commit()
             await utils.finish_with_reply("你已经是好友了，所以绑定成功啦！")
 
         sent_list = await wl.get_sent_friend_requsets()
         if mid in sent_list:
-            user.maimai_id = mid
-            await update_user(user)
+            sess.add(User(user_id=event.get_user_id(), friend_id=mid, df_token=token))
+            await sess.commit()
             await utils.finish_with_reply(
                 "已经给你发过好友请求了啦，同意好友申请就完成绑定啦！"
             )
@@ -125,25 +124,24 @@ async def _(matcher: Matcher, token: str = ArgPlainText(), mid: str = ArgPlainTe
         await utils.send_to_super("on bind: " + str(e))
         await utils.finish_with_reply("发送好友请求失败，请稍后再试或联系管理员")
 
-    user.maimai_id = mid
-    await update_user(user)
+    sess.add(User(user_id=event.get_user_id(), friend_id=mid, df_token=token))
+    await sess.commit()
     await utils.finish_with_reply("给你发送好友请求啦，同意好友申请就完成绑定啦！")
 
 
 @update.handle()
-async def _(event: Event):
-    user: User = await get_or_create_user(event.get_user_id())
+async def _(event: Event, user: User):
     wl = get_wahlap()
 
-    if not user.maimai_id:
+    if not user.friend_id:
         await utils.finish_with_reply("你还未绑定maimai账户，先进行一个账户绑定吧！")
-    if not user.token:
+    if not user.df_token:
         await utils.finish_with_reply("你还未绑定查分器账户，先进行一个账户绑定吧！")
 
     await utils.send_with_reply("开始更新成绩～")
 
     try:
-        await wl.favorite_on_friend(user.maimai_id)
+        await wl.favorite_on_friend(user.friend_id)
     except RuntimeError as e:
         await utils.send_to_super("on update: " + str(e))
         await utils.finish_with_reply("把你登陆到喜爱失败惹，请稍后再试或联系管理员")
@@ -157,7 +155,7 @@ async def _(event: Event):
         return result
 
     tasks = [
-        _wap(update_score(wl, user.token, user.maimai_id, i, plugin_config.strict))
+        _wap(update_score(wl, user.df_token, user.friend_id, i, plugin_config.strict))
         for i in range(5)
     ]
     results = await asyncio.gather(*tasks)
@@ -176,12 +174,12 @@ async def _(event: Event):
         await utils.send_with_reply("所有成绩更新完成！")
 
     try:
-        await wl.favorite_off_friend(user.maimai_id)
+        await wl.favorite_off_friend(user.friend_id)
     except RuntimeError as e:
         utils.send_to_super("on update: " + str(e))
 
 
 @debug.assign("retoken")
-async def _():
-    success = await check_token(force=True)
+async def _(sess: async_scoped_session):
+    success = await check_token(sess, force=True)
     await utils.send_with_reply("token刷新成功！" if success else "token刷新失败")

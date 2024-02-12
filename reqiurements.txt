@@ -1,7 +1,6 @@
 nonebot-plugin-apscheduler
 nonebot-plugin-send-anything-anywhere
 nonebot_plugin_alconna
+nonebot-plugin-orm
 httpx
-peewee
-peewee-async
 aiosqlite

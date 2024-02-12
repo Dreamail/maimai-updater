@@ -4,9 +4,10 @@ from typing import Optional
 import httpx
 from nonebot import logger
 from nonebot_plugin_saa import Image, Text
+from sqlalchemy.ext.asyncio import AsyncSession
 from zoneinfo import ZoneInfo
 
-from .db import get_token, save_token
+from .db import Token
 from .utils import send_to_super
 from .wahlap import Wahlap
 from .wechat import WeChat
@@ -20,21 +21,34 @@ def get_wahlap() -> Wahlap:
     return _wahlap
 
 
-async def init_wahlap():
+async def save_token(sess: AsyncSession, token: str, userid: str):
+    obj = await sess.get(Token, 0)
+    if obj:
+        obj.token = token
+        obj.userid = userid
+    else:
+        obj = Token(id=0, token=token, userid=userid)
+        sess.add(obj)
+    await sess.commit()
+
+
+async def init_wahlap(sess: AsyncSession):
     global _wahlap
     if not _wahlap:
         try:
-            maitoken = await get_token()
+            maitoken = await sess.get(Token, 0)
             if maitoken:
-                _wahlap = Wahlap(*maitoken, save_token)
+                _wahlap = Wahlap(
+                    maitoken.token, maitoken.userid, lambda t, i: save_token(sess, t, i)
+                )
             else:
-                _wahlap = Wahlap(None, None, save_token)
+                _wahlap = Wahlap(None, None, lambda t, i: save_token(sess, t, i))
         except Exception as e:
             logger.exception(e)
             await send_to_super("maibot: create bot client err: " + str(e))
 
 
-async def check_token(force: bool = False) -> bool:
+async def check_token(sess: AsyncSession, force: bool = False) -> bool:
     global _wahlap
     expired = not _wahlap or await _wahlap.is_token_expired()
     isactived = not (
@@ -59,7 +73,8 @@ async def check_token(force: bool = False) -> bool:
                 _wahlap.set_token(*maitoken)
             else:
                 _wahlap = Wahlap()
-            await save_token(*maitoken)
+
+            await save_token(sess, maitoken[0], maitoken[1])
 
             await send_to_super("maibot: refresh token success")
             return True
