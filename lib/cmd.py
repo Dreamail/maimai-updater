@@ -42,10 +42,10 @@ async def _():
 async def pre_bind(matcher: Matcher, event: Event, user: User):
     if user and not matcher.state.get("rebind", False):
         if matcher.get_target() == "confirm":
-            if event.get_plaintext() == "是":
+            if event.get_plaintext().strip() == "是":
                 matcher.state["rebind"] = True
                 return
-            elif event.get_plaintext() == "否":
+            elif event.get_plaintext().strip() == "否":
                 await utils.finish_with_reply("绑定取消")
             else:
                 matcher.set_target("confirm")
