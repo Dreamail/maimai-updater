@@ -1,9 +1,10 @@
 import asyncio
+from typing import Annotated
 
 import httpx
 from arclet.alconna import Alconna, Subcommand
 from nonebot import on_command
-from nonebot.adapters import Event
+from nonebot.adapters import Bot, Event
 from nonebot.exception import FinishedException
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, Depends
@@ -39,8 +40,10 @@ async def _():
     )
 
 
-async def pre_bind(matcher: Matcher, event: Event, user: User):
-    if user and not matcher.state.get("rebind", False):
+async def pre_bind(
+    matcher: Matcher, event: Event, user: Annotated[User, Depends(User)]
+):
+    if user.id and not matcher.state.get("rebind", False):
         if matcher.get_target() == "confirm":
             if event.get_plaintext().strip() == "是":
                 matcher.state["rebind"] = True
@@ -130,13 +133,11 @@ async def _(
 
 
 @update.handle()
-async def _(event: Event, user: User):
+async def _(event: Event, user: Annotated[User, Depends(User)]):
     wl = get_wahlap()
 
-    if not user.friend_id:
-        await utils.finish_with_reply("你还未绑定maimai账户，先进行一个账户绑定吧！")
-    if not user.df_token:
-        await utils.finish_with_reply("你还未绑定查分器账户，先进行一个账户绑定吧！")
+    if not user.id:
+        await utils.finish_with_reply("你还未绑定账户，先进行一个账户绑定吧！")
 
     await utils.send_with_reply("开始更新成绩～")
 
