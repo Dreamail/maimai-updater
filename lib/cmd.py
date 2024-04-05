@@ -18,9 +18,14 @@ from .db import User
 from .prober import DIFF, update_score
 from .wbot import check_token, get_wahlap
 
-mai = on_command("maip", force_whitespace=True, block=True, rule=to_me())
-bind = on_command("maib", force_whitespace=True, block=True, rule=to_me())
-update = on_command("maiu", force_whitespace=True, block=True, rule=to_me())
+
+async def not_me(bot: Bot, event: Event) -> bool:
+    return event.get_user_id() != bot.self_id
+
+
+mai = on_command("maip", force_whitespace=True, block=True, rule=to_me() & not_me)
+bind = on_command("maib", force_whitespace=True, block=True, rule=to_me() & not_me)
+update = on_command("maiu", force_whitespace=True, block=True, rule=to_me() & not_me)
 
 debug = on_alconna(
     Alconna(["/"], "debug", Subcommand("retoken")), block=True, rule=to_me()
