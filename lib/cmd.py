@@ -37,6 +37,7 @@ async def _():
         指令列表：
         /maib 交互式绑定账号
         /maiu 更新成绩
+        /trans [图片] （反向）转生！
 
         注：maip是指maimai prober
         """.strip().replace("    ", "")
@@ -138,7 +139,9 @@ async def _(event: Event, user: USER):
     wl = get_wahlap()
 
     if not user.id:
-        await utils.finish_with_reply("你还未绑定账户，先进行一个账户绑定吧！")
+        await utils.finish_with_reply(
+            "你还未绑定账户，先进行一个账户绑定吧！\n也许你绑定过了，那就试试/trans指令8！"
+        )
 
     await utils.send_with_reply("开始更新成绩～")
 
