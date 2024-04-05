@@ -1,5 +1,4 @@
 import asyncio
-from typing import Annotated
 
 import httpx
 from arclet.alconna import Alconna, Subcommand
@@ -14,7 +13,7 @@ from nonebot_plugin_orm import async_scoped_session
 
 from .. import plugin_config
 from . import utils
-from .db import User
+from .db import USER, User
 from .prober import DIFF, update_score
 from .wbot import check_token, get_wahlap
 
@@ -45,10 +44,8 @@ async def _():
     )
 
 
-async def pre_bind(
-    matcher: Matcher, event: Event, user: Annotated[User, Depends(User)]
-):
-    if user.id and not matcher.state.get("rebind", False):
+async def pre_bind(matcher: Matcher, event: Event, user: USER):
+    if user and not matcher.state.get("rebind", False):
         if matcher.get_target() == "confirm":
             if event.get_plaintext().strip() == "是":
                 matcher.state["rebind"] = True
@@ -138,7 +135,7 @@ async def _(
 
 
 @update.handle()
-async def _(event: Event, user: Annotated[User, Depends(User)]):
+async def _(event: Event, user: USER):
     wl = get_wahlap()
 
     if not user.id:
