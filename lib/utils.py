@@ -1,6 +1,6 @@
 from typing import Any, Callable, Iterable, NoReturn, Optional, Union
 
-from nonebot import get_bots, get_driver
+from nonebot import get_bots, get_driver, logger
 from nonebot.dependencies import Dependent
 from nonebot.exception import FinishedException, RejectedException
 from nonebot.internal.adapter import Bot, Event
@@ -37,23 +37,31 @@ async def send_to_super(msg: MessageFactory | str):
                     TargetQQGroup(group_id=plugin_config.super_group), bot
                 )
         else:
-            if plugin_config.super_channel:
-                if isinstance(msg, str):
-                    msg = Text(msg)
-                await msg.send_to(
-                    TargetQQGuildChannel(channel_id=plugin_config.super_channel), bot
-                )
-            if plugin_config.super_guild_users:
-                for suser in plugin_config.super_guild_users:
-                    split = suser.split("/")
+            try:
+                if plugin_config.super_channel:
                     if isinstance(msg, str):
                         msg = Text(msg)
                     await msg.send_to(
-                        TargetQQGuildDirect(
-                            recipient_id=split[1], source_guild_id=split[0]
-                        ),
+                        TargetQQGuildChannel(channel_id=plugin_config.super_channel),
                         bot,
                     )
+                if plugin_config.super_guild_users:
+                    for suser in plugin_config.super_guild_users:
+                        split = suser.split("/")
+                        if isinstance(msg, str):
+                            msg = Text(msg)
+                        await msg.send_to(
+                            TargetQQGuildDirect(
+                                recipient_id=split[1], source_guild_id=split[0]
+                            ),
+                            bot,
+                        )
+
+            except Exception as e:
+                if str(e).find("push time out of range") != -1:
+                    logger.warning(e)
+                else:
+                    raise
 
 
 async def send_with_reply(msg: MessageFactory | str):
