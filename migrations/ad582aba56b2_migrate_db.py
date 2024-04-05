@@ -5,6 +5,7 @@
 创建时间: 2024-02-12 13:33:17.491874
 
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -12,7 +13,6 @@ from collections.abc import Sequence
 from contextlib import suppress
 
 from alembic import op
-from peewee import Model, TextField
 from sqlalchemy import insert
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -47,7 +47,7 @@ def downgrade_() -> None:
 
 def upgrade_maimai_updater() -> None:
     try:
-        from peewee import SqliteDatabase
+        from peewee import Model, SqliteDatabase, TextField
     except ImportError:
         return
 
