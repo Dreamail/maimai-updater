@@ -55,7 +55,9 @@ async def send_with_reply(msg: MessageFactory | str):
     await msg.send(reply=True, at_sender=True)
 
 
-def add_parameterless(matcher: Matcher, parameterless: Optional[Iterable[Any]] = None):
+def add_parameterless(
+    matcher: Matcher, parameterless: Optional[Iterable[Any]] = None
+) -> Callable[[T_Handler], T_Handler]:
     def _decorator(func: T_Handler) -> T_Handler:
         func_handler = matcher.handlers[-1]
         new_handler = Dependent(
