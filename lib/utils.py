@@ -3,7 +3,7 @@ from typing import Any, Callable, Iterable, NoReturn, Optional, Union
 from nonebot import get_bots, get_driver
 from nonebot.dependencies import Dependent
 from nonebot.exception import FinishedException, RejectedException
-from nonebot.internal.adapter import Event
+from nonebot.internal.adapter import Bot, Event
 from nonebot.internal.params import Depends
 from nonebot.matcher import Matcher
 from nonebot.typing import T_Handler
@@ -17,6 +17,10 @@ from nonebot_plugin_saa import (
 )
 
 from .. import plugin_config
+
+
+async def not_me(bot: Bot, event: Event) -> bool:
+    return event.get_user_id() != bot.self_id
 
 
 async def send_to_super(msg: MessageFactory | str):
