@@ -25,31 +25,35 @@ async def not_me(bot: Bot, event: Event) -> bool:
 
 async def send_to_super(msg: MessageFactory | str):
     for bot in get_bots().values():
-        for suser in get_driver().config.superusers:
-            if isinstance(msg, str):
-                msg = Text(msg)
-            await msg.send_to(TargetQQPrivate(user_id=suser), bot)
-        if plugin_config.super_group:
-            if isinstance(msg, str):
-                msg = Text(msg)
-            await msg.send_to(TargetQQGroup(group_id=plugin_config.super_group), bot)
-        if plugin_config.super_channel:
-            if isinstance(msg, str):
-                msg = Text(msg)
-            await msg.send_to(
-                TargetQQGuildChannel(channel_id=plugin_config.super_channel), bot
-            )
-        if plugin_config.super_guild_users:
-            for suser in plugin_config.super_guild_users:
-                split = suser.split("/")
+        if bot.type != "QQ":
+            for suser in get_driver().config.superusers:
+                if isinstance(msg, str):
+                    msg = Text(msg)
+                await msg.send_to(TargetQQPrivate(user_id=suser), bot)
+            if plugin_config.super_group:
                 if isinstance(msg, str):
                     msg = Text(msg)
                 await msg.send_to(
-                    TargetQQGuildDirect(
-                        recipient_id=split[1], source_guild_id=split[0]
-                    ),
-                    bot,
+                    TargetQQGroup(group_id=plugin_config.super_group), bot
                 )
+        else:
+            if plugin_config.super_channel:
+                if isinstance(msg, str):
+                    msg = Text(msg)
+                await msg.send_to(
+                    TargetQQGuildChannel(channel_id=plugin_config.super_channel), bot
+                )
+            if plugin_config.super_guild_users:
+                for suser in plugin_config.super_guild_users:
+                    split = suser.split("/")
+                    if isinstance(msg, str):
+                        msg = Text(msg)
+                    await msg.send_to(
+                        TargetQQGuildDirect(
+                            recipient_id=split[1], source_guild_id=split[0]
+                        ),
+                        bot,
+                    )
 
 
 async def send_with_reply(msg: MessageFactory | str):
