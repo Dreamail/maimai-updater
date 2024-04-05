@@ -13,9 +13,15 @@ plugin_config = get_plugin_config(Config)
 
 from .lib import wbot  # noqa: E402
 
+_init = False
+
 
 @driver.on_bot_connect
 async def init(sess: async_scoped_session):
+    global _init
+    if _init:
+        return
+    _init = True
     logger.info("init maibot...")
     await wbot.init_wahlap(sess)
     logger.info("check maimai token...")
