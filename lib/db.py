@@ -1,4 +1,4 @@
-from typing import Annotated, TypeAlias
+from typing import Annotated, Optional, TypeAlias
 
 from nonebot.adapters import Event
 from nonebot.params import Depends
@@ -16,13 +16,14 @@ class Token(Model):
 class User(Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[str]
+    sec_id: Mapped[Optional[str]]
     friend_id: Mapped[str]
     df_token: Mapped[str]
 
     @classmethod
     async def from_info(cls, user_id: str):
         """Get user model by user info"""
-        sql = select(cls).where(cls.user_id == user_id)
+        sql = select(cls).where((cls.user_id == user_id) | (cls.sec_id == user_id))
         async with get_session() as session:
             result = await session.execute(sql)
             return result.scalar_one_or_none()
