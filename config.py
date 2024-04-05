@@ -13,3 +13,4 @@ class Config(BaseModel):
 
     class Config:
         extra = "ignore"
+        coerce_numbers_to_str = True
