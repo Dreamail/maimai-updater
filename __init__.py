@@ -1,6 +1,4 @@
-import os
-
-from nonebot import get_driver, logger, require
+from nonebot import get_driver, get_plugin_config, logger, require
 
 require("nonebot_plugin_apscheduler")
 
@@ -11,7 +9,7 @@ driver = get_driver()
 
 from .config import Config  # noqa: E402
 
-plugin_config = Config.parse_obj(driver.config)
+plugin_config = get_plugin_config(Config)
 
 from .lib import wbot  # noqa: E402
 
