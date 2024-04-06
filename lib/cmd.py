@@ -138,7 +138,7 @@ async def _(
 async def _(event: Event, user: USER):
     wl = get_wahlap()
 
-    if not user.id:
+    if not user:
         await utils.finish_with_reply(
             "你还未绑定账户，先进行一个账户绑定吧！\n也许你绑定过了，那就试试/trans指令8！"
         )
