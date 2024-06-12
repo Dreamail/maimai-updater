@@ -43,3 +43,8 @@ try:
     from .lib import qq_official  # noqa: F401
 except:
     pass
+
+try:
+    from .lib.magic import cmd as magic_cmd # noqa: F401
+except:
+    pass
