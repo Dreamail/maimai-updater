@@ -46,5 +46,7 @@ async def _(matcher: Matcher, event: QQMessageEvent, sess: async_scoped_session)
             user.sec_id = event.get_user_id()
             await sess.commit()
             await matcher.finish("跨端绑定成功！")
+        
+        await matcher.finish("你是不是连正常绑定都没绑😠！")
 
-        await matcher.finish("跨端绑定失败喵")
+    await matcher.finish("跨端绑定失败喵")
