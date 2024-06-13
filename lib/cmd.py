@@ -14,16 +14,12 @@ from nonebot_plugin_orm import async_scoped_session
 from .. import plugin_config
 from . import utils
 from .db import USER, User
-from .prober import DIFF, update_score
+from .prober import DIFF, update_score, UploadError
 from .wbot import check_token, get_wahlap
 
 mai = on_command("maip", force_whitespace=True, block=True, rule=utils.not_me)
-bind = on_command(
-    "maib", force_whitespace=True, block=True, rule=utils.not_me
-)
-update = on_command(
-    "maiu", force_whitespace=True, block=True, rule=utils.not_me
-)
+bind = on_command("maib", force_whitespace=True, block=True, rule=utils.not_me)
+update = on_command("maiu", force_whitespace=True, block=True, rule=utils.not_me)
 
 debug = on_alconna(
     Alconna(["/"], "debug", Subcommand("retoken")), block=True, rule=to_me()
@@ -140,7 +136,7 @@ async def _(event: Event, user: USER):
 
     if not user:
         await utils.finish_with_reply(
-            "你还未绑定账户，先进行一个账户绑定吧！\n也许你绑定过了，那就试试对蓝标Bot使用\"/trans [图片]\"指令8！"
+            '你还未绑定账户，先进行一个账户绑定吧！\n也许你绑定过了，那就试试对蓝标Bot使用"/trans [图片]"指令8！'
         )
 
     await utils.send_with_reply("开始更新成绩～")
@@ -156,7 +152,9 @@ async def _(event: Event, user: USER):
             result = await coro
         except Exception as e:
             result = e
-            await utils.send_to_super("on update: " + str(e))
+            await utils.send_to_super(
+                "on update: {type}: {errstr}".format(type=type(e), errstr=str(e))
+            )
         return result
 
     tasks = [
@@ -166,14 +164,22 @@ async def _(event: Event, user: USER):
     results = await asyncio.gather(*tasks)
 
     err_diffs = []
+    df_err = False
     for diff, result in enumerate(results):
         if isinstance(result, Exception):
             err_diffs.append(DIFF[diff])
+            if isinstance(result, UploadError):
+                df_err = True
+
     if len(err_diffs) != 0:
         await utils.send_with_reply(
-            "更新{diff}难度时出现问题，请稍后再试或联系管理员".format(
-                diff=", ".join(err_diffs)
-            )  # noqa: E501
+            "更新{diff}难度".format(diff=", ".join(err_diffs))
+            + (
+                "时出现问题，"
+                if not df_err
+                else "成绩时水鱼报错啦，成功与否是薛定谔的猫，更新失败"
+            )
+            + "请稍后再试或联系管理员"
         )
     else:
         await utils.send_with_reply("所有成绩更新完成！")
