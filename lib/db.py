@@ -21,6 +21,7 @@ class User(Model):
     magic_id: Mapped[Optional[str]]
     friend_id: Mapped[str]
     df_token: Mapped[str]
+    update_times: Mapped[Optional[int]]
 
     @classmethod
     async def from_id(cls, id: str, sess: AsyncSession):
@@ -42,3 +43,13 @@ USER: TypeAlias = Annotated[
         )
     ),
 ]
+
+
+async def get_all_update_times(sess: AsyncSession) -> int:
+    result = (await sess.execute(select(User.update_times))).fetchall()
+    times = 0
+    for t in result:
+        if t[0]:
+            times += t[0]
+
+    return times

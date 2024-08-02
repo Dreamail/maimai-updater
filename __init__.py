@@ -37,6 +37,7 @@ async def shutdown():
 
 
 from .lib import cmd  # noqa: E402, F401
+from .lib import statistics # noqa: E402, F401
 
 try:
     import nonebot.adapters.qq  # noqa: F401
