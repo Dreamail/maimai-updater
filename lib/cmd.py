@@ -17,9 +17,9 @@ from .db import USER, User
 from .prober import DIFF, update_score, UploadError
 from .wbot import check_token, get_wahlap
 
-mai = on_command("maip", force_whitespace=True, block=True, rule=utils.not_me)
-bind = on_command("maib", force_whitespace=True, block=True, rule=utils.not_me)
-update = on_command("maiu", force_whitespace=True, block=True, rule=utils.not_me)
+mai = on_command("maip", force_whitespace=True, priority=100, block=True, rule=utils.not_me)
+bind = on_command("maib", force_whitespace=True, priority=100, block=True, rule=utils.not_me)
+update = on_command("maiu", force_whitespace=True, priority=100, block=True, rule=utils.not_me)
 
 debug = on_alconna(
     Alconna(["/"], "debug", Subcommand("retoken")), block=True, rule=to_me()
