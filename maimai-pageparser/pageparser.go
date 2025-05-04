@@ -1,4 +1,4 @@
-package pageparser
+package maimai_pageparser
 
 import (
 	"encoding/json"
@@ -107,7 +107,7 @@ func ParseRecords(achievementsvs, dxscorevs string, diff int) (string, error) {
 						recordMap[title+kind].FC = "app"
 					}
 				}
-				if strings.Contains(icon[1], "fs") {
+				if strings.Contains(icon[1], "s") {
 					switch icon[1] {
 					case "fs":
 						recordMap[title+kind].FS = "fs"
@@ -117,6 +117,8 @@ func ParseRecords(achievementsvs, dxscorevs string, diff int) (string, error) {
 						recordMap[title+kind].FS = "fsd"
 					case "fsdp":
 						recordMap[title+kind].FS = "fsdp"
+					case "sync":
+						recordMap[title+kind].FS = "sync"
 					}
 				}
 				if recordMap[title+kind].FC != "" && recordMap[title+kind].FS != "" {

@@ -1,5 +1,4 @@
-lib/pageparser
-lib/magic
+nonebot_plugin_maimai_updater/lib/magic
 
 __pycache__
 
@@ -7,3 +6,9 @@ __pycache__
 ._.DS_Store
 
 test-*
+
+.venv
+.devenv
+.direnv
+
+result

@@ -1,4 +1,4 @@
-module maimai-prober
+module maimai_pageparser
 
 go 1.20
 
