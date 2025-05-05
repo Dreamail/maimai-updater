@@ -10,5 +10,6 @@ test-*
 .venv
 .devenv
 .direnv
+.uv-links
 
 result

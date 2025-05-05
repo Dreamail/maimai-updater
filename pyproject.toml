@@ -14,9 +14,17 @@ dependencies = [
     "nonebot-plugin-orm (>=0.7.7,<0.8.0)",
     "httpx (>=0.28.1,<0.29.0)",
     "aiosqlite (>=0.21.0,<0.22.0)",
+    "maimai-pageparser>=0.1.0",
 ]
 
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "nonebot-adapter-onebot>=2.4.6",
+    "nonebot-adapter-qq>=1.6.3",
+    "nonebot-plugin-send-anything-anywhere>=0.7.1",
+]

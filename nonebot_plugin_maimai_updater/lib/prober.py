@@ -4,7 +4,7 @@ from functools import partial
 
 import httpx
 
-from pageparser import ParseRecords
+from maimai_pageparser import ParseRecords
 from .wahlap import Wahlap
 
 DIFF = ["Basic", "Advanced", "Expert", "Master", "Re:Master"]

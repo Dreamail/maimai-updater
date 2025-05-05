@@ -50,16 +50,22 @@
           };
 
           gopy = callPackage ./nix/gopy.nix { inherit python; };
-          pageparser = callPackage ./nix/pageparser.nix {
+          maimai-pageparser = callPackage ./nix/pageparser.nix {
             inherit gopy;
             buildPythonPackage = python.pkgs.buildPythonPackage;
           };
 
-          hacks = callPackage pyproject-nix.build.hacks { };
+          uv-links = pkgs.symlinkJoin {
+            name = "uv-links";
+            paths = [
+              maimai-pageparser.dist
+            ];
+          };
           pageparserOverlay = final: prev: {
-            pageparser = hacks.nixpkgsPrebuilt {
-              from = pageparser;
-            };
+            maimai-pageparser = prev.maimai-pageparser.overrideAttrs (old: {
+              buildInputs = (old.buildInputs or [ ]) ++ maimai-pageparser.buildInputs;
+              src = maimai-pageparser.dist;
+            });
           };
 
           pythonSet =
@@ -82,7 +88,7 @@
           };
 
           packages = {
-            inherit gopy pageparser;
+            inherit gopy maimai-pageparser;
 
             nonebot-plugin-maimai-updater = pythonSet.nonebot-plugin-maimai-updater.overrideAttrs (old: {
               outputs = [
@@ -94,6 +100,15 @@
                 cp -r dist/* $dist/
               '';
             });
+            # nonebot-plugin-maimai-updater = python.pkgs.buildPythonPackage {
+            #   inherit (pythonSet.nonebot-plugin-maimai-updater) pname version;
+
+            #   format = "wheel";
+            #   src = pythonSet.nonebot-plugin-maimai-updater.override {
+            #     pyprojectHook = pythonSet.pyprojectDistHook;
+            #   };
+            #   preUnpack = "export src=$(echo $src/*.whl)";
+            # };
           };
 
           devenv.shells.default =
@@ -115,9 +130,7 @@
                   })
                 ]
               );
-              virtualenv = editablePythonSet.mkVirtualEnv "nonebot-plugin-maimai-updater-dev-env" (
-                workspace.deps.all // { pageparser = [ ]; }
-              );
+              virtualenv = editablePythonSet.mkVirtualEnv "nonebot-plugin-maimai-updater-dev-env" workspace.deps.all;
             in
             {
               packages = [
@@ -141,6 +154,10 @@
 
                 # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
                 export REPO_ROOT=$(git rev-parse --show-toplevel)
+
+                # Extra dependency
+                ln -sfn ${uv-links} .uv-links
+                export UV_FIND_LINKS=$(realpath -s .uv-links)
               '';
             };
         };
