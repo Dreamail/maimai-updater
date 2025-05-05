@@ -48,7 +48,9 @@ async def init_wahlap(sess: AsyncSession):
             await send_to_super("maibot: create bot client err: " + str(e))
 
 
-async def check_token(sess: AsyncSession, force: bool = False) -> bool:
+async def check_token(
+    sess: AsyncSession, force: bool = False, terminal: bool = False
+) -> bool:
     global _wahlap
     expired = not _wahlap or await _wahlap.is_token_expired()
     isactived = not (
@@ -63,10 +65,15 @@ async def check_token(sess: AsyncSession, force: bool = False) -> bool:
             async with httpx.AsyncClient() as client:
                 resp = await client.get("https://login.weixin.qq.com/qrcode/" + uuid)
                 await send_to_super(Image(resp.content) + Text("maibot: token expired"))
+                if terminal:
+                    with open("qrcode.png", "wb") as qr:
+                        qr.write(resp.content)
                 await resp.aclose()
 
             await wc.wait_login()
             await send_to_super("maibot: wechat login success")
+            if terminal:
+                logger.info("maibot: wechat login success")
             maitoken = await wc.get_maitoken()
 
             if _wahlap:
@@ -77,6 +84,8 @@ async def check_token(sess: AsyncSession, force: bool = False) -> bool:
             await save_token(sess, maitoken[0], maitoken[1])
 
             await send_to_super("maibot: refresh token success")
+            if terminal:
+                logger.info("maibot: refresh token success")
             return True
         except Exception as e:
             logger.exception(e)
@@ -86,4 +95,11 @@ async def check_token(sess: AsyncSession, force: bool = False) -> bool:
                 + ": "
                 + str(e)
             )
+            if terminal:
+                logger.info(
+                    "maibot: refresh token failed: "
+                    + str(type(e)).split(".")[-1]
+                    + ": "
+                    + str(e)
+                )
     return False

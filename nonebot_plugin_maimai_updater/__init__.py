@@ -25,7 +25,7 @@ async def init(sess: async_scoped_session):
     logger.info("init maibot...")
     await wbot.init_wahlap(sess)
     logger.info("check maimai token...")
-    await wbot.check_token(sess)
+    await wbot.check_token(sess, terminal=True)
     logger.info("prober init successfully")
 
     scheduler.add_job(wbot.check_token, trigger="interval", args=[sess], hours=1)
@@ -37,7 +37,7 @@ async def shutdown():
 
 
 from .lib import cmd  # noqa: E402, F401
-from .lib import statistics # noqa: E402, F401
+from .lib import statistics  # noqa: E402, F401
 
 try:
     import nonebot.adapters.qq  # noqa: F401
@@ -46,6 +46,6 @@ except ModuleNotFoundError:
     pass
 
 try:
-    from .lib.magic import cmd as magic_cmd # noqa: F401
+    from .lib.magic import cmd as magic_cmd  # noqa: F401
 except ModuleNotFoundError:
     pass
