@@ -5,7 +5,7 @@ from nonebot.dependencies import Dependent
 from nonebot.exception import FinishedException, RejectedException
 from nonebot.internal.adapter import Bot, Event
 from nonebot.internal.params import Depends
-from nonebot.matcher import Matcher
+from nonebot.matcher import Matcher, current_bot
 from nonebot.typing import T_Handler
 from nonebot_plugin_saa import (
     MessageFactory,
@@ -62,7 +62,12 @@ async def send_with_reply(msg: MessageFactory | str):
     """带reply回复消息，仅能用在事件响应器中"""
     if isinstance(msg, str):
         msg = Text(msg)
-    await msg.send(reply=True, at_sender=True)
+
+    reply = True
+    if current_bot.get().type == "QQ":
+        reply = False
+
+    await msg.send(reply=reply, at_sender=reply)
 
 
 def add_parameterless(
