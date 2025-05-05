@@ -1,5 +1,6 @@
 import re
 import time
+from urllib.parse import urlparse, parse_qs
 
 import httpx
 
@@ -74,6 +75,8 @@ class WeChat:
             if params["tip"] == 1:
                 params["tip"] = 0
 
+        redirect_params = parse_qs(urlparse(redirect_uri).query)
+        params.update(redirect_params)
         resp = await self.client.get(redirect_uri, params=params)
         self.domain = resp.url.host
         await resp.aclose()
