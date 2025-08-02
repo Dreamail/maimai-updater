@@ -24,7 +24,11 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "nonebot2[fastapi,httpx,websockets]>=2.4.2",
     "nonebot-adapter-onebot>=2.4.6",
     "nonebot-adapter-qq>=1.6.3",
     "nonebot-plugin-send-anything-anywhere>=0.7.1",
 ]
+
+[project.scripts]
+nonebot-dev-run = "dev:main"

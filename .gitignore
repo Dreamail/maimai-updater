@@ -13,3 +13,5 @@ test-*
 .uv-links
 
 result
+
+.env
