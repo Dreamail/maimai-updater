@@ -3,6 +3,8 @@ from typing import Awaitable, Callable, Optional
 
 import httpx
 
+from .searched_friend_parser import parse_searched_friend
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; U; UOS x86_64; zh-cn) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 UOSBrowser/6.0.1.1001",  # noqa: E501
 }
@@ -38,6 +40,7 @@ class Wahlap:
         self.client = httpx.AsyncClient(
             headers=headers,
             timeout=300,  # TODO: check if dev
+            verify=False
         )
 
         if token and userid:
@@ -80,7 +83,7 @@ class Wahlap:
         except NoTokenError:
             return True
 
-    async def validate_friend_code(self, idx: str) -> bool:
+    async def search_friend(self, idx: str) -> Optional[dict]:
         req = self.client.build_request(
             "GET",
             "https://maimai.wahlap.com/maimai-mobile/friend/search/searchUser/?friendCode="
@@ -91,9 +94,9 @@ class Wahlap:
         self.validate_body(resp.text, "validate friend code failed: ")
 
         if "找不到该玩家" in resp.text:
-            return False
+            return None
 
-        return True
+        return parse_searched_friend(resp.text)
 
     async def _send_friend_api(self, uri: str, **kwargs: str) -> httpx.Response:
         token = self.client.cookies.get("_t", domain="maimai.wahlap.com")

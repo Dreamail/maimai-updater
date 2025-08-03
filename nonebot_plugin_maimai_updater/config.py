@@ -15,6 +15,8 @@ class Config(BaseModel):
     # 2: fetch all
     strict: Optional[int] = 0
 
+    lxns_token: Optional[str] = None
+
     class Config:
         extra = "ignore"
         coerce_numbers_to_str = True
