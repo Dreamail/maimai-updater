@@ -22,7 +22,15 @@ bind = on_command("maib", force_whitespace=True, priority=100, block=True, rule=
 update = on_command("maiu", force_whitespace=True, priority=100, block=True, rule=utils.not_me)
 
 debug = on_alconna(
-    Alconna(["/"], "debug", Subcommand("retoken")), block=True, rule=to_me()
+    Alconna(
+        ["/"],
+        "debug",
+        Subcommand("retoken"),
+        Subcommand("wahlap", Args["method", str]["url", str]),
+    ),
+    block=True,
+    rule=to_me(),
+    permission=SUPERUSER,
 )
 
 
@@ -194,3 +202,23 @@ async def _(event: Event, user: USER):
 async def _(sess: async_scoped_session):
     success = await check_token(sess, force=True)
     await utils.send_with_reply("token刷新成功！" if success else "token刷新失败")
+
+
+@debug.assign("wahlap")
+async def _(method: str, url: str):
+    wl = get_wahlap()
+    req = wl.client.build_request(
+        method=method.upper(),
+        url=url,
+    )
+    resp = await wl.requset(req)
+    if resp.status_code == 200:
+        await utils.send_with_reply(
+            "请求成功！\n" + resp.content.decode() if resp.content else "请求成功！"
+        )
+    else:
+        await utils.send_with_reply(
+            "请求失败，状态码：{code}\n{body}".format(
+                code=resp.status_code, body=await resp.text()
+            )
+        )
