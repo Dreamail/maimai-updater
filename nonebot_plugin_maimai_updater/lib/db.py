@@ -20,7 +20,10 @@ class User(Model):
     sec_id: Mapped[Optional[str]]
     magic_id: Mapped[Optional[str]]
     friend_id: Mapped[str]
-    df_token: Mapped[str]
+    df_token: Mapped[Optional[str]]
+    prober_type: Mapped[Optional[int]] = mapped_column(
+        default=0
+    )  # 0: diving fish, 1: lxns
     update_times: Mapped[Optional[int]]
 
     @classmethod
