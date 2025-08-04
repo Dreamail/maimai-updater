@@ -21,9 +21,8 @@ class User(Model):
     magic_id: Mapped[Optional[str]]
     friend_id: Mapped[str]
     df_token: Mapped[Optional[str]]
-    prober_type: Mapped[Optional[int]] = mapped_column(
-        default=0
-    )  # 0: diving fish, 1: lxns
+    lx_bound: Mapped[Optional[bool]] = mapped_column(default=False)
+    df_bound: Mapped[Optional[bool]] = mapped_column(default=False)
     update_times: Mapped[Optional[int]]
 
     @classmethod
