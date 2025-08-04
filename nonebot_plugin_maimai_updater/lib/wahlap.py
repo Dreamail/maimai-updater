@@ -10,8 +10,7 @@ headers = {
 }
 
 
-class BaseError(Exception):
-    ...
+class BaseError(Exception): ...
 
 
 class NoTokenError(BaseError):
@@ -19,12 +18,10 @@ class NoTokenError(BaseError):
         return "no token"
 
 
-class ValidateBodyError(BaseError):
-    ...
+class ValidateBodyError(BaseError): ...
 
 
-class ApiError(BaseError):
-    ...
+class ApiError(BaseError): ...
 
 
 class Wahlap:
@@ -40,7 +37,6 @@ class Wahlap:
         self.client = httpx.AsyncClient(
             headers=headers,
             timeout=300,  # TODO: check if dev
-            verify=False
         )
 
         if token and userid:
@@ -68,7 +64,7 @@ class Wahlap:
         return resp
 
     @staticmethod
-    def validate_body(body: str, msg: str):
+    def validate_body(body: str, msg: str):  # TODO: detect WAF
         if "错误码：" in body:
             result = re.search(r"错误码：(\d*)", body)
             raise ValidateBodyError(msg + result[1])

@@ -453,6 +453,9 @@ async def _(event: Event, user: USER):
             '你还未绑定账户，先进行一个账户绑定吧！\n也许你绑定过了，那就试试对蓝标Bot使用"/trans [图片]"指令8！'
         )
 
+    # TODO: detect if the user is bound to a prober
+    # TODO: detect if the user is accepted the friend request
+
     await utils.send_with_reply("开始更新成绩～")
 
     try:
@@ -471,28 +474,36 @@ async def _(event: Event, user: USER):
             )
         return result
 
+    lx = Lxns(plugin_config.lxns_token)
     tasks = [
-        _wap(update_score(wl, user.df_token, user.friend_id, i, plugin_config.strict))
+        _wap(
+            update_score(
+                wl,
+                lx,
+                user.df_token,
+                user.friend_id,
+                i,
+                user.df_bound,
+                user.lx_bound,
+                strict=plugin_config.strict,
+            )
+        )
         for i in range(5)
     ]
     results = await asyncio.gather(*tasks)
 
     err_diffs = []
-    df_err = False
+    upload_err = False
     for diff, result in enumerate(results):
         if isinstance(result, Exception):
             err_diffs.append(DIFF[diff])
             if isinstance(result, UploadError):
-                df_err = True
+                upload_err = True
 
     if len(err_diffs) != 0:
         await utils.send_with_reply(
             "更新{diff}难度".format(diff=", ".join(err_diffs))
-            + (
-                "时出现问题，"
-                if not df_err
-                else "成绩时水鱼报错啦，成功与否是薛定谔的猫，更新失败"
-            )
+            + ("时出现问题，" if not upload_err else "时上传失败，")
             + "请稍后再试或联系管理员"
         )
     else:
