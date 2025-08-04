@@ -9,6 +9,10 @@ class Config(BaseModel):
     super_channel: Optional[str] = None
     super_guild_users: Optional[list[str]] = None
 
+    # strict mode
+    # 0: disable
+    # 1: fetch only win and only lose
+    # 2: fetch all
     strict: Optional[int] = 0
 
     class Config:
