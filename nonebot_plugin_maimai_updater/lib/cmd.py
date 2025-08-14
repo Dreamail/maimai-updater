@@ -561,10 +561,10 @@ async def _(method: str, url: str):
         url=url,
     )
     resp = await wl.requset(req)
+    with open("wahlap_debug.html", "wb") as f:
+        f.write(resp.content)
     if resp.status_code == 200:
-        await utils.send_with_reply(
-            "请求成功！\n" + resp.content.decode() if resp.content else "请求成功！"
-        )
+        await utils.send_with_reply("请求成功！")
     else:
         await utils.send_with_reply(
             "请求失败，状态码：{code}\n{body}".format(
