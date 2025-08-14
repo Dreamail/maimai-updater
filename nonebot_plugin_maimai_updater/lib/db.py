@@ -4,8 +4,8 @@ from nonebot.adapters import Event
 from nonebot.params import Depends
 from nonebot_plugin_orm import Model, SQLDepends
 from sqlalchemy import select
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Token(Model):
@@ -20,7 +20,9 @@ class User(Model):
     sec_id: Mapped[Optional[str]]
     magic_id: Mapped[Optional[str]]
     friend_id: Mapped[str]
-    df_token: Mapped[str]
+    df_token: Mapped[Optional[str]]
+    lx_bound: Mapped[Optional[bool]] = mapped_column(default=False)
+    df_bound: Mapped[Optional[bool]] = mapped_column(default=False)
     update_times: Mapped[Optional[int]]
 
     @classmethod
