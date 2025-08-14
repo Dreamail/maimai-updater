@@ -13,7 +13,7 @@ from nonebot_plugin_alconna import Match, on_alconna
 from nonebot_plugin_alconna.params import Check, assign, merge_path
 from nonebot_plugin_orm import async_scoped_session
 
-from .. import plugin_config
+from .. import plugin_config, lxns_enabled
 from . import utils
 from .db import USER, User
 from .lxns import Lxns
@@ -29,7 +29,7 @@ bind = on_alconna(
         "maib",
         Subcommand("fr", Args["friend_code;?", str]),
         Subcommand("df", Args["token;?", str]),
-        Subcommand("lxns"),
+        Subcommand("lxns") if lxns_enabled else None,
         Subcommand("old"),
     ),
     priority=100,
@@ -56,27 +56,43 @@ debug = on_alconna(
 @mai.handle()
 async def _():
     await utils.finish_with_reply(
-        """
-        指令列表：
-        /maib fr (friend_code) 绑定maimai好友
-        /maib df (token) 绑定水鱼查分器账号
-        /maib lxns 绑定落雪查分器账号
-        /maib old 交互式绑定账号（不再维护，仅水鱼查分器）
-        /maiu 更新成绩
-        /trans [图片] （反向）转生！ (仅蓝标Bot可用)
+        (
+            """
+            指令列表：
+            /maib fr (friend_code) 绑定maimai好友
+            /maib df (token) 绑定水鱼查分器账号
+            """
+            + (
+                """/maib lxns 绑定落雪查分器账号
+                """
+                if lxns_enabled
+                else ""
+            )
+            + """/maib old 交互式绑定账号（不再维护，仅水鱼查分器）
+            /maiu 更新成绩
+            /trans [图片] （反向）转生！ (仅蓝标Bot可用)
 
-        使用指北：
-        1. 先绑定maimai好友，使用指令 /maib fr (friend_code) 绑定好友ID。
-        2. 然后绑定查分器账号，使用指令 /maib df (token) 绑定水鱼查分器账号，
-           或者 /maib lxns 绑定落雪查分器账号。
-        3. 最后即可使用指令 /maiu 更新成绩。
+            使用指北：
+            1. 先绑定maimai好友，使用指令 /maib fr (friend_code) 绑定好友ID。
+            """
+            + (
+                """2. 然后绑定查分器账号，使用指令 /maib df (token) 绑定水鱼查分器账号，
+                或者 /maib lxns 绑定落雪查分器账号。"""
+                if lxns_enabled
+                else """2. 然后绑定查分器账号，使用指令 /maib df (token) 绑定水鱼查分器账号。
+                """
+            )
+            + """3. 最后即可使用指令 /maiu 更新成绩。
 
-        注：
-        1. maip是指maimai prober
-        2. 绑定落雪查分器账号时，若不存在账号会询问是否自动创建临时账号。
-        3. 使用落雪查分器账号时，如已有账号需先在查分器设置中开启第三方查询和写入权限。
-        4. 重新绑定maimai好友会删除原有所有查分器绑定信息
-        """.strip().replace("    ", "")
+            注：
+            1. maip是指maimai prober
+            2. 绑定落雪查分器账号时，若不存在账号会询问是否自动创建临时账号。
+            3. 使用落雪查分器账号时，如已有账号需先在查分器设置中开启第三方查询和写入权限。
+            4. 重新绑定maimai好友会删除原有所有查分器绑定信息
+            """
+        )
+        .strip()
+        .replace("    ", "")
     )
 
 
@@ -453,8 +469,13 @@ async def _(event: Event, user: USER):
             '你还未绑定账户，先进行一个账户绑定吧！\n也许你绑定过了，那就试试对蓝标Bot使用"/trans [图片]"指令8！'
         )
 
-    # TODO: detect if the user is bound to a prober
     # TODO: detect if the user is accepted the friend request
+
+    if not user.df_bound and (not user.lx_bound or not lxns_enabled):
+        await utils.finish_with_reply(
+            "你还未绑定查分器账号，请先使用指令 /maib df (token) 绑定水鱼查分器账号"
+            + ("，或使用指令 /maib lxns 绑定落雪查分器账号" if lxns_enabled else "")
+        )
 
     await utils.send_with_reply("开始更新成绩～")
 
@@ -474,7 +495,7 @@ async def _(event: Event, user: USER):
             )
         return result
 
-    lx = Lxns(plugin_config.lxns_token)
+    lx = Lxns(plugin_config.lxns_token) if lxns_enabled else None
     tasks = [
         _wap(
             update_score(

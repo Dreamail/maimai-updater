@@ -1,6 +1,7 @@
 import asyncio
 from contextvars import copy_context
 from functools import partial
+from typing import Optional
 
 import httpx
 
@@ -54,7 +55,7 @@ async def upload_lxns_records(lx: Lxns, friend_code: str, records: str):
 
 async def update_score(
     wl: Wahlap,
-    lx: Lxns,
+    lx: Optional[Lxns],
     token: str,
     friend_code: str,
     diff: int,
@@ -78,7 +79,7 @@ async def update_score(
         if records:
             if update_df:
                 await upload_df_records(token, records)
-            if update_lx:
+            if update_lx and lx is not None:
                 await upload_lxns_records(lx, friend_code, records)
 
     else:
@@ -88,5 +89,5 @@ async def update_score(
     if records:
         if update_df:
             await upload_df_records(token, records)
-        if update_lx:
+        if update_lx and lx is not None:
             await upload_lxns_records(lx, friend_code, records)

@@ -10,6 +10,9 @@ driver = get_driver()
 from .config import Config  # noqa: E402
 
 plugin_config = get_plugin_config(Config)
+lxns_enabled = plugin_config.lxns_token is not None
+if not lxns_enabled:
+    logger.opt(colors=True).warning("<y>Lxns token not set, Lxns prober function is disabled</y>")
 
 from .lib import wbot  # noqa: E402
 
