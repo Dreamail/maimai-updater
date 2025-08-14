@@ -66,7 +66,7 @@ class Lxns:
             "scores": lx_records,
         }
 
-    async def upload_records(self, friend_code: str, records: list):
+    async def upload_records(self, friend_code: str, records: dict):
         resp = await self.client.post(
             f"https://maimai.lxns.net/api/v0/maimai/player/{friend_code}/scores",
             json=records,
