@@ -4,10 +4,10 @@ from functools import partial
 from typing import Optional
 
 import httpx
-
 from maimai_pageparser import ParseRecords
-from .wahlap import Wahlap
+
 from .lxns import Lxns
+from .wahlap import Wahlap
 
 DIFF = ["Basic", "Advanced", "Expert", "Master", "Re:Master"]
 

@@ -4,8 +4,8 @@ from nonebot.adapters import Event
 from nonebot.params import Depends
 from nonebot_plugin_orm import Model, SQLDepends
 from sqlalchemy import select
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Token(Model):

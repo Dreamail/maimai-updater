@@ -13,7 +13,7 @@ from nonebot_plugin_alconna import Match, on_alconna
 from nonebot_plugin_alconna.params import Check, assign, merge_path
 from nonebot_plugin_orm import async_scoped_session
 
-from .. import plugin_config, lxns_enabled
+from .. import lxns_enabled, plugin_config
 from . import utils
 from .db import USER, User
 from .lxns import Lxns
