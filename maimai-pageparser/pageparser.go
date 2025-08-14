@@ -107,15 +107,15 @@ func ParseRecords(achievementsvs, dxscorevs string, diff int) (string, error) {
 						recordMap[title+kind].FC = "app"
 					}
 				}
-				if strings.Contains(icon[1], "s") {
+				if strings.Contains(icon[1], "fs") || strings.Contains(icon[1], "fd") || strings.Contains(icon[1], "sync") {
 					switch icon[1] {
 					case "fs":
 						recordMap[title+kind].FS = "fs"
 					case "fsp":
 						recordMap[title+kind].FS = "fsp"
-					case "fsd":
+					case "fdx":
 						recordMap[title+kind].FS = "fsd"
-					case "fsdp":
+					case "fdxp":
 						recordMap[title+kind].FS = "fsdp"
 					case "sync":
 						recordMap[title+kind].FS = "sync"

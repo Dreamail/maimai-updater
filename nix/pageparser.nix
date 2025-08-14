@@ -5,7 +5,7 @@
 }:
 let
   pname = "maimai-pageparser";
-  version = "0.1.0";
+  version = "0.1.1";
   gopy-pkg = buildGoModule (finalAttrs: {
     inherit pname version;
 
@@ -19,7 +19,7 @@ let
     ];
 
     buildPhase = ''
-      gopy pkg -output=./build maimai_pageparser
+      gopy pkg -output=./build -version=${finalAttrs.version} maimai_pageparser
       echo "from .maimai_pageparser import *" > ./build/maimai_pageparser/__init__.py
     '';
 

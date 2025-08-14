@@ -690,10 +690,10 @@ wheels = [
 
 [[package]]
 name = "maimai-pageparser"
-version = "0.1.0"
+version = "0.1.1"
 source = { registry = ".uv-links" }
 wheels = [
-    { path = "maimai_pageparser-0.1.0-cp310-cp310-linux_x86_64.whl" },
+    { path = "maimai_pageparser-0.1.1-cp310-cp310-linux_x86_64.whl" },
 ]
 
 [[package]]
@@ -1081,7 +1081,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.21.0,<0.22.0" },
     { name = "httpx", specifier = ">=0.28.1,<0.29.0" },
     { name = "lxml", specifier = ">=6.0.0" },
-    { name = "maimai-pageparser", specifier = ">=0.1.0" },
+    { name = "maimai-pageparser", specifier = ">=0.1.1" },
     { name = "nb-cli", specifier = ">=1.4.2" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.57.4,<0.58.0" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0,<0.6.0" },
