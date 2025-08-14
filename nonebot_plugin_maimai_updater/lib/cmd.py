@@ -336,6 +336,17 @@ async def _(
                 "on bind: (" + resp["code"] + ")" + await resp.text
             )
             await utils.finish_with_reply("登录查分器出错啦，请稍后再试或联系管理员")
+
+        resp = await lx.upload_records(friend_code, {})
+        if resp["code"] == 403:
+            await utils.finish_with_reply(
+                "你的落雪查分器账号关闭了第三方写入权限，请到查分器设置中开启"
+            )
+        elif resp["code"] != 200:
+            await utils.send_to_super(
+                "on bind: (" + resp["code"] + ")" + await resp.text
+            )
+            await utils.finish_with_reply("登录查分器出错啦，请稍后再试或联系管理员")
     except FinishedException:
         raise
     except Exception as e:
