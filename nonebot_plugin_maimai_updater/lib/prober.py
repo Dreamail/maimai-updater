@@ -77,17 +77,21 @@ async def update_score(
         avs, dvs, avs2, dvs2 = await asyncio.gather(*tasks)
         records = await parse_page(avs2, dvs2, diff)
         if records:
+            upload_tasks = []
             if update_df:
-                await upload_df_records(token, records)
+                upload_tasks.append(upload_df_records(token, records))
             if update_lx and lx is not None:
-                await upload_lxns_records(lx, friend_code, records)
+                upload_tasks.append(upload_lxns_records(lx, friend_code, records))
+            await asyncio.gather(*upload_tasks)
 
     else:
         avs, dvs = await asyncio.gather(*tasks)
 
     records = await parse_page(avs, dvs, diff)
     if records:
+        upload_tasks = []
         if update_df:
-            await upload_df_records(token, records)
+            upload_tasks.append(upload_df_records(token, records))
         if update_lx and lx is not None:
-            await upload_lxns_records(lx, friend_code, records)
+            upload_tasks.append(upload_lxns_records(lx, friend_code, records))
+        await asyncio.gather(*upload_tasks)
