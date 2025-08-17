@@ -1,7 +1,7 @@
 {
   gopy,
   buildGoModule,
-  buildPythonPackage,
+  python
 }:
 let
   pname = "maimai-pageparser";
@@ -30,8 +30,13 @@ let
 
     doCheck = false;
   });
+
+  inherit (python.pkgs) buildPythonPackage setuptools;
 in
 buildPythonPackage {
   inherit pname version;
   src = gopy-pkg;
+
+  pyproject = true;
+  build-system = [ setuptools ];
 }

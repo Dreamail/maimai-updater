@@ -51,8 +51,7 @@
 
           gopy = callPackage ./nix/gopy.nix { inherit python; };
           maimai-pageparser = callPackage ./nix/pageparser.nix {
-            inherit gopy;
-            buildPythonPackage = python.pkgs.buildPythonPackage;
+            inherit gopy python;
           };
 
           uv-links = pkgs.symlinkJoin {
