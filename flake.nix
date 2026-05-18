@@ -42,7 +42,7 @@
           inherit (inputs) pyproject-nix uv2nix pyproject-build-systems;
           inherit (pkgs) lib callPackage;
 
-          python = pkgs.python310;
+          python = pkgs.python312;
 
           workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
           overlay = workspace.mkPyprojectOverlay {
