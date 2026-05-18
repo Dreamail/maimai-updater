@@ -8,16 +8,16 @@
 }:
 buildGoModule (finalAttrs: {
   pname = "gopy";
-  version = "0.4.10-5f285b8";
+  version = "0.4.10-462a29d";
 
   src = fetchFromGitHub {
     owner = "go-python";
     repo = "gopy";
-    rev = "5f285b890023153b3a17892ef7f04fe9a654bff2";
-    hash = "sha256-agjOzcN+X35A+uw3+RA1m+JbRw0RmtGCJLsBb/KCIS8=";
+    rev = "462a29de1a75fbb139d36cd9a86b9418fb4ec4bc";
+    hash = "sha256-V63lwckfbHPjFg/weioNPfDtyN/0A/IEFsrAG8JnxjQ=";
   };
 
-  vendorHash = "sha256-qdwk6uv+N4CmCMdmdTqmq9K7QihLo9wDb2xbNJ0WWFE=";
+  vendorHash = "sha256-J0Xmgk9YGUNkw7q97RgElgAVSZv5HTLDdsPtmaAaXAM=";
 
   doCheck = false;
 
