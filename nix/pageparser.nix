@@ -7,12 +7,13 @@ let
   pname = "maimai-pageparser";
   version = "0.1.1";
   gopy-pkg = buildGoModule (finalAttrs: {
-    inherit pname version;
+    pname = "${pname}-gopy-pkg";
+    inherit version;
 
     src = ../maimai-pageparser;
 
-    proxyVendor = true;
-    vendorHash = "sha256-74cj0q3MlsbOgW0g0jIpB3dztQ7rLfv1Lmkk6YA4C/0=";
+    proxyVendor = false;
+    vendorHash = "sha256-v+WMfnFe38f6WnMk7/IqddOtW01Rfjw8YnKhT7Y0Qyg=";
 
     nativeBuildInputs = [
       gopy

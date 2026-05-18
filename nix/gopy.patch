@@ -1,0 +1,68 @@
+diff --git a/bind/gen.go b/bind/gen.go
+index 3685bbab..6a4299d7 100644
+--- a/bind/gen.go
++++ b/bind/gen.go
+@@ -352,7 +352,7 @@ def Init():
+ # %[2]s
+ 
+ GOCMD=go
+-GOBUILD=$(GOCMD) build -mod=mod
++GOBUILD=$(GOCMD) build -mod=vendor
+ GOIMPORTS=goimports
+ PYTHON=%[4]s
+ LIBEXT=%[5]s
+@@ -391,7 +391,7 @@ build:
+ # %[2]s
+ 
+ GOCMD=go
+-GOBUILD=$(GOCMD) build -mod=mod
++GOBUILD=$(GOCMD) build -mod=vendor
+ GOIMPORTS=goimports
+ PYTHON=%[4]s
+ LIBEXT=%[5]s
+diff --git a/cmd_build.go b/cmd_build.go
+index 24b0191c..8b2c7e24 100644
+--- a/cmd_build.go
++++ b/cmd_build.go
+@@ -132,7 +132,7 @@ func runBuild(mode bind.BuildMode, cfg *BuildCfg) error {
+ 		cmd = exec.Command(cfg.VM, "build.py")
+ 		cmd.Run() // will fail, we don't care about errors
+ 
+-		args := []string{"build", "-mod=mod", "-buildmode=c-shared"}
++		args := []string{"build", "-mod=vendor", "-buildmode=c-shared"}
+ 		if cfg.BuildTags != "" {
+ 			args = append(args, "-tags", cfg.BuildTags)
+ 		}
+@@ -157,7 +157,7 @@ func runBuild(mode bind.BuildMode, cfg *BuildCfg) error {
+ 		err = os.Remove(cfg.Name + "_go" + libExt)
+ 
+ 		fmt.Printf("go build -o py%s\n", cfg.Name)
+-		cmd = exec.Command("go", "build", "-mod=mod")
++		cmd = exec.Command("go", "build", "-mod=vendor")
+ 		if cfg.BuildTags != "" {
+ 			args = append(args, "-tags", cfg.BuildTags)
+ 		}
+@@ -181,7 +181,7 @@ func runBuild(mode bind.BuildMode, cfg *BuildCfg) error {
+ 
+ 		// build the go shared library upfront to generate the header
+ 		// needed by our generated cpython code
+-		args := []string{"build", "-mod=mod", "-buildmode=c-shared"}
++		args := []string{"build", "-mod=vendor", "-buildmode=c-shared"}
+ 		if cfg.BuildTags != "" {
+ 			args = append(args, "-tags", cfg.BuildTags)
+ 		}
+diff --git a/main_test.go b/main_test.go
+index c5f6c29e..3c595f8e 100644
+--- a/main_test.go
++++ b/main_test.go
+@@ -55,8 +55,8 @@ var (
+ )
+ 
+ func init() {
+-	os.Setenv("GOFLAGS", "-mod=mod")
+-	testEnvironment = append(testEnvironment, "GOFLAGS=-mod=mod")
++	os.Setenv("GOFLAGS", "-mod=vendor")
++	testEnvironment = append(testEnvironment, "GOFLAGS=-mod=vendor")
+ }
+ 
+ func TestGovet(t *testing.T) {

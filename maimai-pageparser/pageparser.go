@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	_ "github.com/go-python/gopy/gopyh"
 	"github.com/antchfx/htmlquery"
 )
 
