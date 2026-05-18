@@ -12,7 +12,7 @@ test-*
 .direnv
 .uv-links
 
-result
+result*
 
 .env
 
